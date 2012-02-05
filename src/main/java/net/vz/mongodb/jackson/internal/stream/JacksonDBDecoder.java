@@ -42,6 +42,7 @@ public class JacksonDBDecoder<T> implements DBDecoder {
         this.dbCollection = dbCollection;
         this.objectMapper = objectMapper;
         this.type = type;
+        
     }
 
     public DBCallback getDBCallback(DBCollection collection) {
@@ -59,7 +60,9 @@ public class JacksonDBDecoder<T> implements DBDecoder {
 
     public DBObject decode(InputStream in, DBCollection collection) throws IOException {
         JacksonDBObject<T> decoded = new JacksonDBObject<T>();
-        decoded.setObject((T) objectMapper.readValue(new DBDecoderBsonParser(0, in, decoded, dbCollection), type));
+        DBDecoderBsonParser dbDecoder = new DBDecoderBsonParser(0, in, decoded, dbCollection);
+        dbDecoder.setCodec(objectMapper);
+        decoded.setObject((T) objectMapper.readValue(dbDecoder, type));
         return decoded;
     }
 
